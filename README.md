@@ -180,7 +180,30 @@ Contribuições, testes e novas descobertas sobre o protocolo são bem-vindos.
 
 ## Aviso
 
-O programa ainda se encontra apenas em linha de comando, não possui interface 
-para funcionar e só baixar todo o conteúdo colocarem uma pasta e abrir como administrador um terminal 
-e rodar "dotnet run" sem as aspas
-o windows defender pode acusar vírus pois o programa acessa funções de api do sistema para mostrar a temperatura de acordo com o que o windows relata
+## Como executar
+
+O projeto atualmente funciona **apenas via linha de comando (CLI)** e ainda não possui uma interface gráfica.
+
+Para executar:
+
+1. Baixe ou clone o repositório.
+2. Coloque todos os arquivos do projeto em uma pasta.
+3. Abra um terminal **como Administrador** dentro da pasta do projeto.
+4. Execute o comando:
+
+```bash
+dotnet run
+```
+
+> Não é necessário utilizar aspas no comando.
+
+### Windows Defender
+
+Dependendo das configurações de segurança do Windows, o **Windows Defender ou outro antivírus pode exibir um alerta durante a execução**.
+
+Isso pode acontecer porque o programa acessa APIs e recursos do sistema operacional para obter a temperatura da CPU informada pelo próprio Windows.
+
+O projeto não possui a intenção de realizar nenhuma atividade maliciosa. O acesso a recursos do sistema é necessário para obter as informações de hardware e enviá-las ao display do watercooler.
+
+Como o projeto ainda está em desenvolvimento e não possui um instalador ou assinatura digital, alguns mecanismos de segurança podem classificar o executável como potencialmente suspeito.
+
