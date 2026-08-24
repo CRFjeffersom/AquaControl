@@ -1,6 +1,6 @@
 # Pichau Aqua 240X — Controle do Display
 
-Projeto para controlar o display do **Pichau Aqua 240X** e enviar a temperatura da CPU diretamente para a bomba do watercooler.
+Projeto para controlar o display do **Pichau Aqua 240X**(Talvez funcione nas variantes como 120x e 360x mas não os tenhos para teste)  e enviar a temperatura da CPU diretamente para a bomba do watercooler.
 
 ## Sobre o projeto
 
