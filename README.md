@@ -1,2 +1,186 @@
-# WatercoolerTemp
-// Envia a temperatura da CPU para o display do watercooler Pichau Aqua 240X // (chip WCH CH340, VID 0x1a86 / PID 0x484a), via porta serial virtual (COM3). // // Baseado na engenharia reversa do protocolo feita capturando o tráfego USB // do software oficial com Wireshark + USBPcap. // // Estrutura do pacote identificada (payload, 23 bytes): //     74 00 TT 08 26 XX YY ZZ 02 03 2e 02 02 02 02 02 02 02 02 02 02 30 1d //              ^^ //              byte que carrega a temperatura da CPU em °C (confirmado) // // IMPORTANTE: os bytes fixos (08 26, XX YY ZZ, 02 03 2e, os 02 repetidos, // 30 1d) foram copiados de capturas reais e podem codificar outros dados // (RPM da bomba, checksum) que ainda não identificamos com certeza. // Se o display se comportar de forma estranha, é sinal de que algum desses // precisa ser calculado dinamicamente em vez de fixo. // // Requer rodar como Administrador (já configurado via app.manifest) e que // o software oficial do watercooler esteja FECHADO (ele usa a COM3 sozinho).
+# Pichau Aqua 240X — Controle do Display
+
+Projeto para controlar o display do **Pichau Aqua 240X** e enviar a temperatura da CPU diretamente para a bomba do watercooler.
+
+## Sobre o projeto
+
+O Pichau Aqua 240X utiliza um controlador **WCH CH340** para comunicação USB, expondo o dispositivo como uma porta serial virtual.
+
+Este projeto foi desenvolvido a partir da engenharia reversa do protocolo utilizado pelo software oficial do watercooler, o lineng tech.
+A comunicação foi analisada através de capturas USB realizadas com:
+
+* Wireshark
+* USBPcap
+* Software oficial do Pichau Aqua 240X
+* Claude para verificar as leituras do USBPcap
+
+---
+
+## Identificação do dispositivo
+
+| Informação      | Valor            |
+| --------------- | ---------------- |
+| Dispositivo     | Pichau Aqua 240X |
+| Controlador     | WCH CH340        |
+| VID             | `0x1A86`         |
+| PID             | `0x484A`         |
+| Interface       | Serial virtual   |
+| Porta utilizada | `COM3`           |
+
+---
+
+## Protocolo identificado
+
+Foi identificado um payload de **23 bytes** utilizado para atualizar o display:
+
+```text
+74 00 TT 08 26 XX YY ZZ 02 03 2E 02 02 02 02 02 02 02 02 02 30 1D
+```
+
+### Temperatura da CPU
+
+O terceiro byte do pacote (`TT`) foi confirmado como o campo responsável pela temperatura da CPU.
+
+```text
+74 00 TT 08 26 XX YY ZZ ...
+      ↑
+  temperatura
+```
+
+A temperatura é enviada em hexadecimal.
+
+Por exemplo:
+
+```text
+55 °C = 0x37
+```
+
+O pacote correspondente começaria com:
+
+```text
+74 00 37 08 26 ...
+```
+
+---
+
+## Estrutura conhecida
+
+|  Byte | Valor | Estado                 |
+| ----: | ----- | ---------------------- |
+|     0 | `74`  | Confirmado             |
+|     1 | `00`  | Confirmado             |
+|     2 | `TT`  | **Temperatura da CPU** |
+|     3 | `08`  | Ainda não identificado |
+|     4 | `26`  | Ainda não identificado |
+|     5 | `XX`  | Ainda não identificado |
+|     6 | `YY`  | Ainda não identificado |
+|     7 | `ZZ`  | Ainda não identificado |
+|     8 | `02`  | Ainda não identificado |
+|     9 | `03`  | Ainda não identificado |
+|    10 | `2E`  | Ainda não identificado |
+| 11–20 | `02`  | Ainda não identificado |
+|    21 | `30`  | Ainda não identificado |
+|    22 | `1D`  | Ainda não identificado |
+
+> **Nota:** os valores ainda não identificados foram obtidos através de capturas reais do software oficial e estão sendo utilizados como valores fixos durante os testes.
+
+---
+
+## O que ainda precisa ser descoberto
+
+Apesar de o campo da temperatura já estar confirmado, ainda existem partes do protocolo que precisam ser analisadas.
+
+Possíveis funções ainda não identificadas:
+
+* RPM da bomba;
+* estado do dispositivo;
+* modo de operação;
+* flags de controle;
+* contador de pacotes;
+* checksum;
+* CRC;
+* outros dados utilizados pelo controlador.
+
+Os bytes finais `30 1D`, por exemplo, podem representar algum mecanismo de verificação de integridade, mas isso ainda não foi confirmado.
+
+---
+
+## Comunicação
+
+Atualmente o projeto utiliza a porta serial virtual:
+COM3
+
+O software oficial do watercooler deve estar **fechado** durante os testes, pois ele utiliza a mesma porta e pode impedir o acesso ao dispositivo.
+
+## Permissões
+O programa requer execução como **Administrador**.
+A solicitação de privilégios já está configurada através do:
+
+app.manifest
+
+
+## Engenharia reversa
+
+O protocolo foi descoberto através da comparação de diferentes pacotes enviados pelo software oficial
+
+### Fluxo utilizado
+
+
+Pichau Aqua 240X
+       ↓
+   WCH CH340
+       ↓
+   USB / Serial
+       ↓
+     COM3
+       ↓
+Software oficial
+       ↓
+Captura com USBPcap
+       ↓
+    Wireshark
+       ↓
+Análise dos pacotes
+       ↓
+Identificação do protocolo
+
+
+---
+
+## Status do projeto
+
+### Confirmado
+
+* [x] Identificação do controlador USB
+* [x] VID/PID
+* [x] Comunicação através de porta serial virtual
+* [x] Identificação da `COM3`
+* [x] Captura dos pacotes USB
+* [x] Identificação do payload
+* [x] Identificação do byte da temperatura
+* [x] Envio da temperatura para o display
+
+### Em investigação
+
+* [ ] Identificar os bytes `08 26`
+* [ ] Identificar `XX YY ZZ`
+* [ ] Identificar os bytes `02 03 2E`
+* [ ] Identificar os bytes repetidos
+* [ ] Descobrir a função de `30 1D`
+* [ ] Confirmar se existe checksum/CRC
+* [ ] Identificar dados relacionados ao RPM
+* [ ] Identificar outros comandos do dispositivo
+
+---
+
+## Aviso
+Este projeto foi desenvolvido através de **engenharia reversa e análise do tráfego de comunicação do dispositivo**.
+O protocolo apresentado neste README representa o estado atual da pesquisa e pode sofrer alterações conforme novas informações sejam descobertas.
+Contribuições, testes e novas descobertas sobre o protocolo são bem-vindos.
+
+## Aviso
+
+O programa ainda se encontra apenas em linha de comando, não possui interface 
+para funcionar e só baixar todo o conteúdo colocarem uma pasta e abrir como administrador um terminal 
+e rodar "dotnet run" sem as aspas
+o windows defender pode acusar vírus pois o programa acessa funções de api do sistema para mostrar a temperatura de acordo com o que o windows relata
