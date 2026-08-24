@@ -207,3 +207,9 @@ O projeto não possui a intenção de realizar nenhuma atividade maliciosa. O ac
 
 Como o projeto ainda está em desenvolvimento e não possui um instalador ou assinatura digital, alguns mecanismos de segurança podem classificar o executável como potencialmente suspeito.
 
+Compatibilidade
+
+Atualmente, o protocolo foi confirmado utilizando um Pichau Aqua 240X.
+
+A compatibilidade com outros modelos da linha Aqua, como Aqua 120X e Aqua 360X, ainda não foi confirmada
+
