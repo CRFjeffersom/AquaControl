@@ -88,7 +88,7 @@ O pacote correspondente começaria com:
 
 ## O que ainda precisa ser descoberto
 
-Apesar de o campo da temperatura já estar confirmado, ainda existem partes do protocolo que precisam ser analisadas.
+Apesar de o campo da temperatura já estar confirmado, ainda existem partes do protocolo que precisam ser analisadas, eu não tenho muito interesse nisso pois só quero o visor funcionando e como ele só monstra temperatura não me aprofundei muito.
 
 Possíveis funções ainda não identificadas:
 
