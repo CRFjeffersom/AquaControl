@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "shiyZYHuH+8=",
+  "dgSpecHash": "cI8BXKZCNm0=",
   "success": true,
   "projectFilePath": "D:\\Projetos\\WatercoolerTemp\\WatercoolerTemp.csproj",
   "expectedPackageFiles": [
@@ -24,7 +24,6 @@
     "C:\\Users\\Jeffersom\\.nuget\\packages\\runtime.native.system.io.ports\\9.0.0\\runtime.native.system.io.ports.9.0.0.nupkg.sha512",
     "C:\\Users\\Jeffersom\\.nuget\\packages\\runtime.osx-arm64.runtime.native.system.io.ports\\9.0.0\\runtime.osx-arm64.runtime.native.system.io.ports.9.0.0.nupkg.sha512",
     "C:\\Users\\Jeffersom\\.nuget\\packages\\runtime.osx-x64.runtime.native.system.io.ports\\9.0.0\\runtime.osx-x64.runtime.native.system.io.ports.9.0.0.nupkg.sha512",
-    "C:\\Users\\Jeffersom\\.nuget\\packages\\system.codedom\\9.0.0\\system.codedom.9.0.0.nupkg.sha512",
     "C:\\Users\\Jeffersom\\.nuget\\packages\\system.io.filesystem.accesscontrol\\5.0.0\\system.io.filesystem.accesscontrol.5.0.0.nupkg.sha512",
     "C:\\Users\\Jeffersom\\.nuget\\packages\\system.io.ports\\9.0.0\\system.io.ports.9.0.0.nupkg.sha512",
     "C:\\Users\\Jeffersom\\.nuget\\packages\\system.management\\9.0.0\\system.management.9.0.0.nupkg.sha512"
