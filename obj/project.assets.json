@@ -2033,11 +2033,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projetos\\WatercoolerTemp\\WatercoolerTemp.csproj",
+      "projectUniqueName": "D:\\Programação\\AquaControl\\WatercoolerTemp.csproj",
       "projectName": "WatercoolerTemp",
-      "projectPath": "D:\\Projetos\\WatercoolerTemp\\WatercoolerTemp.csproj",
+      "projectPath": "D:\\Programação\\AquaControl\\WatercoolerTemp.csproj",
       "packagesPath": "C:\\Users\\Jeffersom\\.nuget\\packages\\",
-      "outputPath": "D:\\Projetos\\WatercoolerTemp\\obj\\",
+      "outputPath": "D:\\Programação\\AquaControl\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Jeffersom\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2096,7 +2096,7 @@
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           },
-          "Microsoft.WindowsDesktop.App.WPF": {
+          "Microsoft.WindowsDesktop.App": {
             "privateAssets": "none"
           }
         },

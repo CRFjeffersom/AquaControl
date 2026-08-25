@@ -24,6 +24,7 @@ public sealed class WatercoolerMonitorService : IDisposable
     {
         temperatureReader.Open();
         serialClient.Open();
+        AppLogger.Info("Monitoramento aberto.");
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -55,6 +56,7 @@ public sealed class WatercoolerMonitorService : IDisposable
         }
         catch (Exception ex)
         {
+            AppLogger.Error("Erro no monitoramento", ex);
             Error?.Invoke(ex);
             throw;
         }

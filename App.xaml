@@ -13,16 +13,17 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Foreground" Value="#71807D" />
             <Setter Property="FontSize" Value="16" />
+            <Setter Property="Cursor" Value="Hand" />
         </Style>
         <Style x:Key="ActionButton" TargetType="Button">
-            <Setter Property="Height" Value="24" />
+            <Setter Property="Width" Value="210" />
+            <Setter Property="Height" Value="32" />
             <Setter Property="Padding" Value="8,0" />
-            <Setter Property="Margin" Value="0,0,4,0" />
             <Setter Property="Background" Value="#151B1B" />
             <Setter Property="BorderBrush" Value="#2D3A38" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="#A7B8B3" />
-            <Setter Property="FontSize" Value="8" />
+            <Setter Property="FontSize" Value="11" />
         </Style>
     </Application.Resources>
 </Application>

@@ -7,19 +7,29 @@ using WatercoolerTemp.Core;
 
 namespace WatercoolerTemp.ViewModels;
 
-public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
+public sealed class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 {
     private const int IntervalMs = 1000;
     private const string PortName = "COM3";
+    private const int ReconnectIntervalMs = 5000;
+    private const int HighTemperatureThreshold = 90;
+    private const int AlertResetThreshold = 80;
     private readonly DispatcherTimer displayTimer;
+    private readonly DispatcherTimer reconnectTimer;
     private WatercoolerMonitorService? service;
     private CancellationTokenSource? monitorCancellation;
     private Task? monitorTask;
-    private string status = "DISCONNECTED";
-    private string message = "READY";
+    private string status = "DESCONECTADO";
+    private string message = "PRONTO";
     private double targetTemperature;
     private double displayedTemperature;
     private bool isConnected;
+    private bool isMonitoring;
+    private int? minimumTemperature;
+    private int? maximumTemperature;
+    private double averageTemperature;
+    private int temperatureSamples;
+    private bool highTemperatureAlertShown;
 
     public MainViewModel()
     {
@@ -28,11 +38,49 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             Interval = TimeSpan.FromMilliseconds(16)
         };
         displayTimer.Tick += AnimateDisplay;
+        reconnectTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(ReconnectIntervalMs) };
+        reconnectTimer.Tick += (_, _) =>
+        {
+            if (!IsConnected)
+                Connect();
+        };
 
         ConnectionCommand = new RelayCommand(ToggleConnection);
+        reconnectTimer.Start();
+        Connect();
     }
 
     public RelayCommand ConnectionCommand { get; }
+
+    public bool IsStartupEnabled
+    {
+        get => StartupManager.IsEnabled;
+        set
+        {
+            if (value == IsStartupEnabled)
+                return;
+
+            try
+            {
+                StartupManager.SetEnabled(value);
+                OnPropertyChanged();
+            }
+            catch (Exception exception)
+            {
+                Message = exception.Message;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool IsMonitoring
+    {
+        get => isMonitoring;
+        private set
+        {
+            SetField(ref isMonitoring, value);
+        }
+    }
 
     public string Status
     {
@@ -45,6 +93,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         get => message;
         private set => SetField(ref message, value);
     }
+
+    public string MinimumTemperatureText => minimumTemperature is null ? "--" : $"{minimumTemperature} °C";
+    public string MaximumTemperatureText => maximumTemperature is null ? "--" : $"{maximumTemperature} °C";
+    public string AverageTemperatureText => temperatureSamples == 0 ? "--" : $"{averageTemperature:0} °C";
 
     public double DisplayedTemperature
     {
@@ -62,8 +114,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public string TemperatureText => $"{Math.Round(DisplayedTemperature):0}";
     public double Progress => Math.Clamp(DisplayedTemperature, 0, 100) / 100;
-    public Brush IndicatorBrush => new SolidColorBrush(GetTemperatureColor(DisplayedTemperature));
-    public Brush StatusBrush => IsConnected ? new SolidColorBrush(Color.FromRgb(83, 235, 151)) : new SolidColorBrush(Color.FromRgb(104, 116, 113));
+    public System.Windows.Media.Brush IndicatorBrush => CreateBrush(GetTemperatureColor(DisplayedTemperature));
+    public System.Windows.Media.Brush StatusBrush => IsConnected ? ConnectedBrush : DisconnectedBrush;
     public bool IsConnected
     {
         get => isConnected;
@@ -77,11 +129,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public string ConnectionActionText => IsConnected ? "DISCONNECT" : "CONNECT";
+    public string ConnectionActionText => IsConnected ? "DESCONECTAR" : "CONECTAR";
 
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event Action<int>? HighTemperatureAlert;
 
-    private void ToggleConnection()
+    public void ToggleConnection()
     {
         if (IsConnected)
             _ = DisconnectAsync();
@@ -89,8 +142,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             Connect();
     }
 
-    private void Connect()
+    public void Connect()
     {
+        if (IsConnected)
+            return;
+
         try
         {
             var reader = new CpuTemperatureReader();
@@ -101,72 +157,128 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             service.Error += OnServiceError;
             service.Open();
             IsConnected = true;
-            Status = "CONNECTED";
+            Status = "CONECTADO";
             StartMonitoring();
-            Message = $"{PortName} MONITORING";
+            Message = "MONITORAMENTO ATIVO";
+            ResetStatistics();
+            AppLogger.Info($"Conectado em {PortName}.");
         }
         catch (Exception exception)
         {
             service?.Dispose();
             service = null;
-            Status = "DISCONNECTED";
-            Message = exception.Message;
+            Status = "DESCONECTADO";
+            IsConnected = false;
+            Message = $"AGUARDANDO {PortName}";
+            AppLogger.Error($"Falha ao conectar em {PortName}", exception);
         }
     }
 
-    private void StartMonitoring()
+    public void StartMonitoring()
     {
-        if (service is null)
+        if (service is null || IsMonitoring)
             return;
 
         monitorCancellation = new CancellationTokenSource();
         monitorTask = Task.Run(() => service.StartAsync(monitorCancellation.Token), monitorCancellation.Token);
+        IsMonitoring = true;
     }
 
-    private async Task StopAsync()
+    public async Task StopMonitoringAsync()
     {
-        if (monitorCancellation is null)
+        CancellationTokenSource? cancellation = monitorCancellation;
+        if (cancellation is null)
             return;
 
-        monitorCancellation.Cancel();
-        if (monitorTask is not null)
-            await monitorTask;
-
-        monitorCancellation.Dispose();
-        monitorCancellation = null;
-        monitorTask = null;
+        cancellation.Cancel();
+        try
+        {
+            if (monitorTask is not null)
+            {
+                await monitorTask;
+            }
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            Message = exception.Message;
+        }
+        finally
+        {
+            cancellation.Dispose();
+            if (ReferenceEquals(monitorCancellation, cancellation))
+            {
+                monitorCancellation = null;
+                monitorTask = null;
+                IsMonitoring = false;
+            }
+        }
     }
 
     private async Task DisconnectAsync()
     {
         if (monitorCancellation is not null)
-            await StopAsync();
+            await StopMonitoringAsync();
 
         service?.Dispose();
         service = null;
         IsConnected = false;
-        Status = "DISCONNECTED";
-        Message = "READY";
+        Status = "DESCONECTADO";
+        Message = "PRONTO";
     }
 
     private void OnTemperatureSent(int temperature, byte[] pacote)
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             targetTemperature = Math.Clamp(temperature, 0, 100);
+            EvaluateTemperatureAlert(temperature);
+            temperatureSamples++;
+            averageTemperature = ((averageTemperature * (temperatureSamples - 1)) + temperature) / temperatureSamples;
+            minimumTemperature = minimumTemperature is null ? temperature : Math.Min(minimumTemperature.Value, temperature);
+            maximumTemperature = maximumTemperature is null ? temperature : Math.Max(maximumTemperature.Value, temperature);
             displayTimer.Start();
-            Message = $"SENT  {temperature:00} C";
+            Message = $"TEMPERATURA ENVIADA  {temperature:00} °C";
+            OnPropertyChanged(nameof(MinimumTemperatureText));
+            OnPropertyChanged(nameof(MaximumTemperatureText));
+            OnPropertyChanged(nameof(AverageTemperatureText));
         });
+    }
+
+    private void EvaluateTemperatureAlert(int temperature)
+    {
+        if (temperature <= AlertResetThreshold)
+        {
+            highTemperatureAlertShown = false;
+            return;
+        }
+
+        if (temperature >= HighTemperatureThreshold && !highTemperatureAlertShown)
+        {
+            highTemperatureAlertShown = true;
+            HighTemperatureAlert?.Invoke(temperature);
+        }
     }
 
     private void OnTemperatureUnavailable()
     {
-        Application.Current.Dispatcher.Invoke(() => Message = "CPU SENSOR UNAVAILABLE");
+        System.Windows.Application.Current.Dispatcher.Invoke(() => Message = "SENSOR DA CPU INDISPONÍVEL");
     }
 
     private void OnServiceError(Exception exception)
     {
-        Application.Current.Dispatcher.Invoke(() => Message = exception.Message);
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsConnected = false;
+            IsMonitoring = false;
+            Status = "ERRO DE CONEXÃO";
+            Message = "TENTANDO RECONECTAR";
+            service?.Dispose();
+            service = null;
+            AppLogger.Error("Monitoramento desconectado", exception);
+        });
     }
 
     private void AnimateDisplay(object? sender, EventArgs eventArgs)
@@ -182,40 +294,63 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         DisplayedTemperature += difference * 0.14;
     }
 
-    private static Color GetTemperatureColor(double temperature)
+    private static System.Windows.Media.Color GetTemperatureColor(double temperature)
     {
         if (temperature <= 70)
-            return Color.FromRgb(83, 235, 151);
+            return System.Windows.Media.Color.FromRgb(83, 235, 151);
         if (temperature <= 80)
-            return Interpolate(Color.FromRgb(83, 235, 151), Color.FromRgb(245, 213, 73), (temperature - 70) / 10);
+            return Interpolate(System.Windows.Media.Color.FromRgb(83, 235, 151), System.Windows.Media.Color.FromRgb(245, 213, 73), (temperature - 70) / 10);
         if (temperature <= 90)
-            return Interpolate(Color.FromRgb(245, 213, 73), Color.FromRgb(245, 137, 54), (temperature - 80) / 10);
+            return Interpolate(System.Windows.Media.Color.FromRgb(245, 213, 73), System.Windows.Media.Color.FromRgb(245, 137, 54), (temperature - 80) / 10);
 
-        return Interpolate(Color.FromRgb(245, 137, 54), Color.FromRgb(255, 65, 75), (temperature - 90) / 10);
+        return Interpolate(System.Windows.Media.Color.FromRgb(245, 137, 54), System.Windows.Media.Color.FromRgb(255, 65, 75), (temperature - 90) / 10);
     }
 
-    private static Color Interpolate(Color from, Color to, double amount)
+    private static System.Windows.Media.Color Interpolate(System.Windows.Media.Color from, System.Windows.Media.Color to, double amount)
     {
         amount = Math.Clamp(amount, 0, 1);
-        return Color.FromRgb(
+        return System.Windows.Media.Color.FromRgb(
             (byte)(from.R + (to.R - from.R) * amount),
             (byte)(from.G + (to.G - from.G) * amount),
             (byte)(from.B + (to.B - from.B) * amount));
     }
 
-    public async void Dispose()
+    public async ValueTask DisposeAsync()
     {
         if (monitorCancellation is not null)
-            await StopAsync();
+            await StopMonitoringAsync();
 
         service?.Dispose();
+        service = null;
         displayTimer.Stop();
+        reconnectTimer.Stop();
     }
 
     private void RefreshCommands()
     {
         OnPropertyChanged(nameof(ConnectionActionText));
         ConnectionCommand.Refresh();
+    }
+
+    private void ResetStatistics()
+    {
+        minimumTemperature = null;
+        maximumTemperature = null;
+        averageTemperature = 0;
+        temperatureSamples = 0;
+        OnPropertyChanged(nameof(MinimumTemperatureText));
+        OnPropertyChanged(nameof(MaximumTemperatureText));
+        OnPropertyChanged(nameof(AverageTemperatureText));
+    }
+
+    private static readonly System.Windows.Media.Brush ConnectedBrush = CreateBrush(System.Windows.Media.Color.FromRgb(83, 235, 151));
+    private static readonly System.Windows.Media.Brush DisconnectedBrush = CreateBrush(System.Windows.Media.Color.FromRgb(104, 116, 113));
+
+    private static System.Windows.Media.Brush CreateBrush(System.Windows.Media.Color color)
+    {
+        var brush = new SolidColorBrush(color);
+        brush.Freeze();
+        return brush;
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

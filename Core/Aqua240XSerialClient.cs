@@ -16,9 +16,12 @@ public sealed class Aqua240XSerialClient : IDisposable
 
     public string PortName => porta.PortName;
 
+    public bool IsOpen => porta.IsOpen;
+
     public void Open()
     {
         porta.Open();
+        AppLogger.Info($"Porta {PortName} aberta.");
     }
 
     public void Send(byte[] pacote)
@@ -29,7 +32,10 @@ public sealed class Aqua240XSerialClient : IDisposable
     public void Dispose()
     {
         if (porta.IsOpen)
+        {
             porta.Close();
+            AppLogger.Info($"Porta {PortName} fechada.");
+        }
 
         porta.Dispose();
     }

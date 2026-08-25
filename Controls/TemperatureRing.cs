@@ -15,9 +15,9 @@ public sealed class TemperatureRing : FrameworkElement
     public static readonly DependencyProperty IndicatorBrushProperty =
         DependencyProperty.Register(
             nameof(IndicatorBrush),
-            typeof(Brush),
+            typeof(System.Windows.Media.Brush),
             typeof(TemperatureRing),
-            new FrameworkPropertyMetadata(Brushes.LimeGreen, FrameworkPropertyMetadataOptions.AffectsRender));
+            new FrameworkPropertyMetadata(System.Windows.Media.Brushes.LimeGreen, FrameworkPropertyMetadataOptions.AffectsRender));
 
     public double Progress
     {
@@ -25,9 +25,9 @@ public sealed class TemperatureRing : FrameworkElement
         set => SetValue(ProgressProperty, value);
     }
 
-    public Brush IndicatorBrush
+    public System.Windows.Media.Brush IndicatorBrush
     {
-        get => (Brush)GetValue(IndicatorBrushProperty);
+        get => (System.Windows.Media.Brush)GetValue(IndicatorBrushProperty);
         set => SetValue(IndicatorBrushProperty, value);
     }
 
@@ -37,8 +37,8 @@ public sealed class TemperatureRing : FrameworkElement
 
         double centerX = ActualWidth / 2;
         double centerY = ActualHeight / 2;
-        double radius = Math.Max(0, Math.Min(ActualWidth, ActualHeight) / 2 - 18);
-        double dotRadius = 2.2;
+        double radius = Math.Max(0, Math.Min(ActualWidth, ActualHeight) / 2 - 12);
+        double dotRadius = 2.4;
         int dotCount = 72;
         int activeDots = (int)Math.Round(Math.Clamp(Progress, 0, 1) * dotCount);
 
@@ -48,10 +48,10 @@ public sealed class TemperatureRing : FrameworkElement
             double x = centerX + Math.Cos(angle) * radius;
             double y = centerY + Math.Sin(angle) * radius;
             bool isActive = index < activeDots;
-            Brush brush = isActive ? IndicatorBrush : new SolidColorBrush(Color.FromArgb(38, 210, 220, 220));
+            System.Windows.Media.Brush brush = isActive ? IndicatorBrush : new SolidColorBrush(System.Windows.Media.Color.FromArgb(38, 210, 220, 220));
             double currentRadius = isActive ? dotRadius : 1.6;
 
-            drawingContext.DrawEllipse(brush, null, new Point(x, y), currentRadius, currentRadius);
+            drawingContext.DrawEllipse(brush, null, new System.Windows.Point(x, y), currentRadius, currentRadius);
         }
     }
 }

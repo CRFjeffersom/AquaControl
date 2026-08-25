@@ -13,6 +13,7 @@ public sealed class CpuTemperatureReader : IDisposable
     public void Open()
     {
         computer.Open();
+        AppLogger.Info("Leitor de temperatura aberto.");
     }
 
     public int? ReadTemperature()
@@ -42,5 +43,6 @@ public sealed class CpuTemperatureReader : IDisposable
     public void Dispose()
     {
         computer.Close();
+        AppLogger.Info("Leitor de temperatura fechado.");
     }
 }

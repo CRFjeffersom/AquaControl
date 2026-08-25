@@ -33,7 +33,7 @@ internal class Program
 
     private static async Task Main()
     {
-        Console.WriteLine("=== Controle de Display - Pichau Aqua 240X ===\n");
+        Console.WriteLine("=== Aqua Control - Display do Pichau Aqua 240X ===\n");
 
         using var temperatureReader = new CpuTemperatureReader();
         using var serialClient = new Aqua240XSerialClient(PortaCom, BaudRate);

@@ -1,6 +1,6 @@
-# Pichau Aqua 240X — Controle do Display
+# Aqua Control — Display do Pichau Aqua 240X
 
-Projeto para controlar o display do **Pichau Aqua 240X**(Talvez funcione nas variantes como 120x e 360x mas não os tenhos para teste)  e enviar a temperatura da CPU diretamente para a bomba do watercooler.
+Projeto para controlar o display do **Pichau Aqua 240X**(Talvez funcione nas variantes como 120x e 360x mas não os tenhos para teste) e enviar a temperatura da CPU diretamente para a bomba do watercooler.
 
 ## Sobre o projeto
 
@@ -9,10 +9,10 @@ O Pichau Aqua 240X utiliza um controlador **WCH CH340** para comunicação USB, 
 Este projeto foi desenvolvido a partir da engenharia reversa do protocolo utilizado pelo software oficial do watercooler, o lineng tech.
 A comunicação foi analisada através de capturas USB realizadas com:
 
-* Wireshark
-* USBPcap
-* Software oficial do Pichau Aqua 240X
-* Claude para verificar as leituras do USBPcap
+- Wireshark
+- USBPcap
+- Software oficial do Pichau Aqua 240X
+- Claude para verificar as leituras do USBPcap
 
 ---
 
@@ -92,14 +92,14 @@ Apesar de o campo da temperatura já estar confirmado, ainda existem partes do p
 
 Possíveis funções ainda não identificadas:
 
-* RPM da bomba;
-* estado do dispositivo;
-* modo de operação;
-* flags de controle;
-* contador de pacotes;
-* checksum;
-* CRC;
-* outros dados utilizados pelo controlador.
+- RPM da bomba;
+- estado do dispositivo;
+- modo de operação;
+- flags de controle;
+- contador de pacotes;
+- checksum;
+- CRC;
+- outros dados utilizados pelo controlador.
 
 Os bytes finais `30 1D`, por exemplo, podem representar algum mecanismo de verificação de integridade, mas isso ainda não foi confirmado.
 
@@ -113,11 +113,11 @@ COM3
 O software oficial do watercooler deve estar **fechado** durante os testes, pois ele utiliza a mesma porta e pode impedir o acesso ao dispositivo.
 
 ## Permissões
+
 O programa requer execução como **Administrador**.
 A solicitação de privilégios já está configurada através do:
 
 app.manifest
-
 
 ## Engenharia reversa
 
@@ -125,25 +125,23 @@ O protocolo foi descoberto através da comparação de diferentes pacotes enviad
 
 ### Fluxo utilizado
 
-
 Pichau Aqua 240X
-       ↓
-   WCH CH340
-       ↓
-   USB / Serial
-       ↓
-     COM3
-       ↓
+↓
+WCH CH340
+↓
+USB / Serial
+↓
+COM3
+↓
 Software oficial
-       ↓
+↓
 Captura com USBPcap
-       ↓
-    Wireshark
-       ↓
+↓
+Wireshark
+↓
 Análise dos pacotes
-       ↓
+↓
 Identificação do protocolo
-
 
 ---
 
@@ -151,51 +149,64 @@ Identificação do protocolo
 
 ### Confirmado
 
-* [x] Identificação do controlador USB
-* [x] VID/PID
-* [x] Comunicação através de porta serial virtual
-* [x] Identificação da `COM3`
-* [x] Captura dos pacotes USB
-* [x] Identificação do payload
-* [x] Identificação do byte da temperatura
-* [x] Envio da temperatura para o display
+- [x] Identificação do controlador USB
+- [x] VID/PID
+- [x] Comunicação através de porta serial virtual
+- [x] Identificação da `COM3`
+- [x] Captura dos pacotes USB
+- [x] Identificação do payload
+- [x] Identificação do byte da temperatura
+- [x] Envio da temperatura para o display
 
 ### Em investigação
 
-* [ ] Identificar os bytes `08 26`
-* [ ] Identificar `XX YY ZZ`
-* [ ] Identificar os bytes `02 03 2E`
-* [ ] Identificar os bytes repetidos
-* [ ] Descobrir a função de `30 1D`
-* [ ] Confirmar se existe checksum/CRC
-* [ ] Identificar dados relacionados ao RPM
-* [ ] Identificar outros comandos do dispositivo
+- [ ] Identificar os bytes `08 26`
+- [ ] Identificar `XX YY ZZ`
+- [ ] Identificar os bytes `02 03 2E`
+- [ ] Identificar os bytes repetidos
+- [ ] Descobrir a função de `30 1D`
+- [ ] Confirmar se existe checksum/CRC
+- [ ] Identificar dados relacionados ao RPM
+- [ ] Identificar outros comandos do dispositivo
 
 ---
 
 ## Aviso
+
 Este projeto foi desenvolvido através de **engenharia reversa e análise do tráfego de comunicação do dispositivo**.
 O protocolo apresentado neste README representa o estado atual da pesquisa e pode sofrer alterações conforme novas informações sejam descobertas.
 Contribuições, testes e novas descobertas sobre o protocolo são bem-vindos.
 
-## Aviso
-
 ## Como executar
 
-O projeto atualmente funciona **apenas via linha de comando (CLI)** e ainda não possui uma interface gráfica.
+O projeto possui uma interface gráfica WPF e fica disponível na bandeja do Windows.
 
 Para executar:
 
 1. Baixe ou clone o repositório.
 2. Coloque todos os arquivos do projeto em uma pasta.
 3. Abra um terminal **como Administrador** dentro da pasta do projeto.
-4. Execute o comando:
+4. Execute o projeto:
 
 ```bash
 dotnet run
 ```
 
-> Não é necessário utilizar aspas no comando.
+Ao iniciar, a aplicação tenta conectar automaticamente à porta fixa `COM3` e tenta reconectar a cada 5 segundos quando o dispositivo não está disponível.
+
+O botão de conexão permite iniciar ou interromper o monitoramento. A interface também exibe as temperaturas mínima, média e máxima.
+
+## Diagnóstico
+
+Os eventos de conexão, desconexão e erro são registrados em:
+
+```text
+%LOCALAPPDATA%\AquaControl\aquacontrol.log
+```
+
+Quando a temperatura da CPU atinge `90 °C`, o Windows exibe uma notificação de temperatura alta. O alerta não se repete enquanto a temperatura permanecer acima desse limite e é liberado novamente quando ela cai para `80 °C` ou menos.
+
+O software oficial do watercooler deve estar **fechado** durante os testes, pois ele utiliza a mesma porta e pode impedir o acesso ao dispositivo.
 
 ### Windows Defender
 
@@ -212,4 +223,3 @@ Compatibilidade
 Atualmente, o protocolo foi confirmado utilizando um Pichau Aqua 240X.
 
 A compatibilidade com outros modelos da linha Aqua, como Aqua 120X e Aqua 360X, ainda não foi confirmada
-
