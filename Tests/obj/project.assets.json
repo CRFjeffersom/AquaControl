@@ -1715,7 +1715,7 @@
           "build/net8.0/xunit.runner.visualstudio.props": {}
         }
       },
-      "WatercoolerTemp/1.0.0": {
+      "Aqua Control/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
@@ -1723,10 +1723,10 @@
           "System.IO.Ports": "9.0.0"
         },
         "compile": {
-          "bin/placeholder/WatercoolerTemp.dll": {}
+          "bin/placeholder/Aqua Control.dll": {}
         },
         "runtime": {
-          "bin/placeholder/WatercoolerTemp.dll": {}
+          "bin/placeholder/Aqua Control.dll": {}
         },
         "frameworkReferences": [
           "Microsoft.WindowsDesktop.App"
@@ -2907,7 +2907,7 @@
         "xunit.runner.visualstudio.nuspec"
       ]
     },
-    "WatercoolerTemp/1.0.0": {
+    "Aqua Control/1.0.0": {
       "type": "project",
       "path": "../WatercoolerTemp.csproj",
       "msbuildProject": "../WatercoolerTemp.csproj"
@@ -2915,8 +2915,8 @@
   },
   "projectFileDependencyGroups": {
     "net10.0-windows": [
+      "Aqua Control >= 1.0.0",
       "Microsoft.NET.Test.Sdk >= 17.14.1",
-      "WatercoolerTemp >= 1.0.0",
       "xunit >= 2.9.3",
       "xunit.runner.visualstudio >= 3.1.4"
     ]
@@ -2927,11 +2927,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\Programação\\AquaControl\\Tests\\AquaControl.Tests.csproj",
+      "projectUniqueName": "D:\\Programação\\AquaControl\\Tests\\AquaControl.Tests.csproj",
       "projectName": "AquaControl.Tests",
-      "projectPath": "d:\\Programação\\AquaControl\\Tests\\AquaControl.Tests.csproj",
+      "projectPath": "D:\\Programação\\AquaControl\\Tests\\AquaControl.Tests.csproj",
       "packagesPath": "C:\\Users\\Jeffersom\\.nuget\\packages\\",
-      "outputPath": "d:\\Programação\\AquaControl\\Tests\\obj\\",
+      "outputPath": "D:\\Programação\\AquaControl\\Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Jeffersom\\AppData\\Roaming\\NuGet\\NuGet.Config"

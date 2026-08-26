@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.IO;
 
 namespace WatercoolerTemp.Core;
 
@@ -14,7 +15,9 @@ public static class StartupManager
         get
         {
             using RegistryKey? key = Registry.CurrentUser.OpenSubKey(RunKey);
-            return key?.GetValue(ValueName) is string value && !string.IsNullOrWhiteSpace(value);
+            return key?.GetValue(ValueName) is string value
+                && TryGetExecutablePath(value, out string executablePath)
+                && File.Exists(executablePath);
         }
     }
 
@@ -23,7 +26,8 @@ public static class StartupManager
         using RegistryKey key = Registry.CurrentUser.CreateSubKey(RunKey);
         if (enabled)
         {
-            string executablePath = Process.GetCurrentProcess().MainModule?.FileName
+            string executablePath = Environment.ProcessPath
+                ?? Process.GetCurrentProcess().MainModule?.FileName
                 ?? throw new InvalidOperationException("Não foi possível localizar o executável da aplicação.");
             key.SetValue(ValueName, $"\"{executablePath}\" {StartupArgument}");
         }
@@ -35,4 +39,18 @@ public static class StartupManager
 
     public static bool IsStartupLaunch(string[] args) =>
         args.Any(argument => string.Equals(argument, StartupArgument, StringComparison.OrdinalIgnoreCase));
+
+    private static bool TryGetExecutablePath(string command, out string executablePath)
+    {
+        executablePath = string.Empty;
+        if (!command.StartsWith('"'))
+            return false;
+
+        int closingQuote = command.IndexOf('"', 1);
+        if (closingQuote <= 1)
+            return false;
+
+        executablePath = command[1..closingQuote];
+        return true;
+    }
 }
