@@ -11,12 +11,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AquaControl.ico</ApplicationIcon>
     <RootNamespace>WatercoolerTemp</RootNamespace>
   </PropertyGroup>
+
+  
 
   <ItemGroup>
     <Compile Remove="Program.cs" />
     <Compile Remove="Tests\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\AquaControl.png" />
+    <Content Include="Assets\AquaControl.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

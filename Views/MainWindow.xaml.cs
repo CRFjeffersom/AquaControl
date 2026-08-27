@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
+using System.IO;
 using Forms = System.Windows.Forms;
 using Drawing = System.Drawing;
 using WatercoolerTemp.Core;
@@ -14,6 +15,7 @@ public partial class MainWindow : Window
     private readonly Forms.ToolStripMenuItem showMenuItem;
     private readonly Forms.ToolStripMenuItem startMenuItem;
     private readonly Forms.ToolStripMenuItem stopMenuItem;
+    private readonly Drawing.Icon trayIconImage;
     private readonly MainViewModel viewModel;
     private bool isClosing;
 
@@ -42,9 +44,14 @@ public partial class MainWindow : Window
         exitMenuItem.Click += (_, _) => Close();
         menu.Items.Add(exitMenuItem);
 
+        trayIconImage = new Drawing.Icon(Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "AquaControl.ico"));
+
         trayIcon = new Forms.NotifyIcon
         {
-            Icon = Drawing.SystemIcons.Application,
+            Icon = trayIconImage,
             Text = "Aqua Control",
             ContextMenuStrip = menu,
             Visible = true
@@ -152,6 +159,7 @@ public partial class MainWindow : Window
         viewModel.HighTemperatureAlert -= ShowHighTemperatureAlert;
         trayIcon.Visible = false;
         trayIcon.Dispose();
+        trayIconImage.Dispose();
         Close();
     }
 }
