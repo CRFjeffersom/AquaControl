@@ -1,10 +1,10 @@
-# Aqua Control — Display do Pichau Aqua 240X
+# Aqua Control — Display do watercooler Pichau Aqua 
 
-Projeto para controlar o display do **Pichau Aqua 240X**(Talvez funcione nas variantes como 120x e 360x mas não os tenhos para teste) e enviar a temperatura da CPU diretamente para a bomba do watercooler.
+Projeto para controlar o display do **Pichau Aqua X** e enviar a temperatura da CPU diretamente para o visor do watercooler.
 
 ## Sobre o projeto
 
-O Pichau Aqua 240X utiliza um controlador **WCH CH340** para comunicação USB, expondo o dispositivo como uma porta serial virtual.
+O Pichau Aqua 240X e suas variantes utilizam um controlador **WCH CH340** para comunicação USB, expondo o dispositivo como uma porta serial virtual.
 
 Este projeto foi desenvolvido a partir da engenharia reversa do protocolo utilizado pelo software oficial do watercooler, o lineng tech.
 A comunicação foi analisada através de capturas USB realizadas com:
