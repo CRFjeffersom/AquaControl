@@ -123,27 +123,7 @@ app.manifest
 
 O protocolo foi descoberto através da comparação de diferentes pacotes enviados pelo software oficial
 
-### Fluxo utilizado
 
-Pichau Aqua 240X
-↓
-WCH CH340
-↓
-USB / Serial
-↓
-COM3
-↓
-Software oficial
-↓
-Captura com USBPcap
-↓
-Wireshark
-↓
-Análise dos pacotes
-↓
-Identificação do protocolo
-
----
 
 ## Status do projeto
 
@@ -177,13 +157,7 @@ Ao iniciar, a aplicação tenta conectar automaticamente à porta fixa `COM3` e 
 
 O botão de conexão permite iniciar ou interromper o monitoramento. A interface também exibe as temperaturas mínima, média e máxima.
 
-## Diagnóstico
 
-Os eventos de conexão, desconexão e erro são registrados em:
-
-```text
-%LOCALAPPDATA%\AquaControl\aquacontrol.log
-```
 
 Quando a temperatura da CPU atinge `90 °C`, o Windows exibe uma notificação de temperatura alta. O alerta não se repete enquanto a temperatura permanecer acima desse limite e é liberado novamente quando ela cai para `80 °C` ou menos.
 
