@@ -223,3 +223,8 @@ Compatibilidade
 Atualmente, o protocolo foi confirmado utilizando um Pichau Aqua 240X.
 
 A compatibilidade com outros modelos da linha Aqua, como Aqua 120X e Aqua 360X, ainda não foi confirmada
+
+
+o icone do programa é fornecido pelo https://www.flaticon.com/ pelo autor Yobany_MTOM
+https://www.flaticon.com/free-icon/sea_8312504?term=water&page=1&position=36&origin=search&related_id=8312504
+
