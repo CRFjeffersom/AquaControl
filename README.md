@@ -138,16 +138,6 @@ O protocolo foi descoberto através da comparação de diferentes pacotes enviad
 - [x] Identificação do byte da temperatura
 - [x] Envio da temperatura para o display
 
-### Em investigação
-
-- [ ] Identificar os bytes `08 26`
-- [ ] Identificar `XX YY ZZ`
-- [ ] Identificar os bytes `02 03 2E`
-- [ ] Identificar os bytes repetidos
-- [ ] Descobrir a função de `30 1D`
-- [ ] Confirmar se existe checksum/CRC
-- [ ] Identificar dados relacionados ao RPM
-- [ ] Identificar outros comandos do dispositivo
 
 ---
 
