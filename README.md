@@ -171,26 +171,7 @@ Identificação do protocolo
 
 ---
 
-## Aviso
 
-Este projeto foi desenvolvido através de **engenharia reversa e análise do tráfego de comunicação do dispositivo**.
-O protocolo apresentado neste README representa o estado atual da pesquisa e pode sofrer alterações conforme novas informações sejam descobertas.
-Contribuições, testes e novas descobertas sobre o protocolo são bem-vindos.
-
-## Como executar
-
-O projeto possui uma interface gráfica WPF e fica disponível na bandeja do Windows.
-
-Para executar:
-
-1. Baixe ou clone o repositório.
-2. Coloque todos os arquivos do projeto em uma pasta.
-3. Abra um terminal **como Administrador** dentro da pasta do projeto.
-4. Execute o projeto:
-
-```bash
-dotnet run
-```
 
 Ao iniciar, a aplicação tenta conectar automaticamente à porta fixa `COM3` e tenta reconectar a cada 5 segundos quando o dispositivo não está disponível.
 
