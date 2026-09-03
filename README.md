@@ -1,6 +1,7 @@
 # Aqua Control — Display do watercooler Pichau Aqua 
 
-<img width="498" height="534" alt="Captura de tela 2026-08-28 183429" src="https://github.com/user-attachments/assets/77300921-8d62-4a14-928f-63652fc609eb" />
+<img width="1132" height="594" alt="Captura de tela 2026-09-03 132925" src="https://github.com/user-attachments/assets/eeed29b4-9daf-490b-bf00-96a22662d1d2" />
+
 
 
 Projeto para controlar o display do **Pichau Aqua X** e enviar a temperatura da CPU diretamente para o visor do watercooler.
